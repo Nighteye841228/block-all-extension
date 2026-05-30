@@ -1,5 +1,21 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>Block-All Options</title></head>
-<body><div id="app">Block-All Options</div><script type="module" src="./main.ts"></script></body>
+<head>
+  <meta charset="utf-8">
+  <title>Block-All Options</title>
+  <link rel="stylesheet" href="./options.css">
+</head>
+<body>
+  <header>
+    <h1>Block-All for Threads</h1>
+    <nav id="tabs">
+      <button data-tab="blocklist" class="active">黑名單</button>
+      <button data-tab="tags">標籤</button>
+      <button data-tab="settings">偏好設定</button>
+      <button data-tab="iox">匯入 / 匯出</button>
+    </nav>
+  </header>
+  <main id="main"></main>
+  <script type="module" src="./main.ts"></script>
+</body>
 </html>
