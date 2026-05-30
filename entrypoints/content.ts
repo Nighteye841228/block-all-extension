@@ -5,6 +5,8 @@ import { attachObserver, createProcessor } from '@content/observer';
 import { injectBlockButton } from '@content/block-button';
 import { extractAuthorUsername } from '@content/extractor';
 import { SELECTORS } from '@content/selectors';
+import { maybeInjectCommentButton, attachLikesDialogTrigger } from '@content/triggers';
+import { openAuditModal } from '@ui/audit-modal';
 
 export default defineContentScript({
   matches: ['https://*.threads.com/*', 'https://*.threads.net/*'],
@@ -27,11 +29,36 @@ export default defineContentScript({
       });
     };
 
+    const openAuditFor = (usernames: string[]) => {
+      if (usernames.length === 0) return;
+      const host = document.createElement('div');
+      document.body.appendChild(host);
+      openAuditModal({
+        state, usernames, mountTo: host, useShadow: true,
+        onSave: async rows => {
+          for (const r of rows) {
+            state.blockedUsers[r.username] = {
+              username: r.username, tagIds: r.tagIds, note: r.note,
+              addedAt: state.blockedUsers[r.username]?.addedAt ?? Date.now(),
+              sourceUrl: location.href,
+            };
+          }
+          await saveState(state);
+          host.remove();
+        },
+        onCancel: () => host.remove(),
+      });
+    };
+
     processor.enqueueAll(document);
     document.querySelectorAll<HTMLElement>(SELECTORS.postContainer).forEach(decorate);
 
     attachObserver(document.body, el => { processor.enqueue(el); decorate(el); });
     subscribeState(next => { state = next; processor.enqueueAll(document); });
+
+    maybeInjectCommentButton(openAuditFor);
+    attachLikesDialogTrigger(openAuditFor);
+    window.addEventListener('popstate', () => maybeInjectCommentButton(openAuditFor));
 
     if (state.settings.debugMode) console.log('[block-all] content loaded', state);
   },
