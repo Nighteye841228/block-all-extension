@@ -1,4 +1,5 @@
 {
+  "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -11,11 +12,10 @@
     "isolatedModules": true,
     "types": ["chrome", "vitest/globals"],
     "paths": {
-      "@core/*": ["src/core/*"],
-      "@content/*": ["src/content/*"],
-      "@ui/*": ["src/ui/*"]
-    },
-    "baseUrl": "."
+      "@core/*": ["./src/core/*"],
+      "@content/*": ["./src/content/*"],
+      "@ui/*": ["./src/ui/*"]
+    }
   },
-  "include": ["src", "entrypoints", "test-fixtures", "vitest.config.ts", "wxt.config.ts"]
+  "include": ["src", "entrypoints", "test-fixtures", "vitest.config.ts", "wxt.config.ts", ".wxt/wxt.d.ts"]
 }
