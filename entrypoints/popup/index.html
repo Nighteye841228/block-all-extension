@@ -3,18 +3,42 @@
 <head>
   <meta charset="utf-8">
   <title>Block-All</title>
+  <link rel="stylesheet" href="../options/options.css">
   <style>
-    body { width: 280px; margin: 0; padding: 12px; font-family: -apple-system, sans-serif; color: #18181b; }
-    h1 { font-size: 14px; margin: 0 0 8px; }
-    .row { display: flex; align-items: center; justify-content: space-between; margin: 8px 0; font-size: 13px; }
-    .stat { font-size: 12px; color: #71717a; }
-    button { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #d4d4d8; background: white; cursor: pointer; font-size: 13px; margin-top: 6px; }
-    button:disabled { color: #a1a1aa; cursor: not-allowed; }
-    a { display: block; text-align: center; margin-top: 8px; font-size: 12px; color: #2563eb; text-decoration: none; }
+    html, body { width: 760px; margin: 0; background: #fafafa; }
+    body { font-family: -apple-system, sans-serif; color: #18181b; }
+    header { padding: 12px 16px; }
+    header h1 { font-size: 15px; margin: 0 0 8px; }
+    header .header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    header .meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #71717a; }
+    main { padding: 12px 16px; max-width: none; }
+    nav button { padding: 6px 10px; font-size: 13px; }
+    .list-row { grid-template-columns: 200px 1fr 1fr auto; gap: 8px; padding: 6px; font-size: 13px; }
+    .bulk-bar { font-size: 12px; gap: 8px; }
+    .list-row input { font-size: 13px; padding: 6px; }
+    .field { margin-bottom: 12px; }
+    .tag-chip.muted { background: transparent !important; color: #a1a1aa; border: 1px dashed #d4d4d8; }
+    .open-full { font-size: 12px; color: #2563eb; text-decoration: none; cursor: pointer; background: transparent; border: 0; padding: 0; }
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <header>
+    <div class="header-row">
+      <h1>Block-All for Threads</h1>
+      <div class="meta">
+        <label><input type="checkbox" id="enabled"> 啟用</label>
+        <span id="count" class="stat"></span>
+        <button class="open-full" id="open-options">在分頁開啟 ↗</button>
+      </div>
+    </div>
+    <nav id="tabs">
+      <button data-tab="blocklist" class="active">黑名單</button>
+      <button data-tab="tags">標籤</button>
+      <button data-tab="settings">偏好設定</button>
+      <button data-tab="iox">匯入 / 匯出</button>
+    </nav>
+  </header>
+  <main id="main"></main>
   <script type="module" src="./main.ts"></script>
 </body>
 </html>

@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enabled: true,
   defaultActionWhenNoTag: 'fold',
   showHiddenCountBadge: true,
+  showSourceUrlInBanner: false,
   debugMode: false,
 };
 

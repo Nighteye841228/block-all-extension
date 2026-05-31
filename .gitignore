@@ -3,3 +3,5 @@ node_modules/
 .wxt/
 *.log
 .DS_Store
+.refs/
+.superpowers

@@ -13,6 +13,9 @@ export function renderSettings(host: HTMLElement, state: AppState, persist: (s: 
       <label><input type="checkbox" name="showHiddenCountBadge" ${state.settings.showHiddenCountBadge ? 'checked' : ''}> 在 popup 顯示本頁折疊計數</label>
     </div>
     <div class="field">
+      <label><input type="checkbox" name="showSourceUrlInBanner" ${state.settings.showSourceUrlInBanner ? 'checked' : ''}> 在封鎖橫幅顯示加入來源連結</label>
+    </div>
+    <div class="field">
       <label><input type="checkbox" name="debugMode" ${state.settings.debugMode ? 'checked' : ''}> 除錯模式（console 紀錄）</label>
     </div>
   `;
@@ -22,6 +25,10 @@ export function renderSettings(host: HTMLElement, state: AppState, persist: (s: 
   });
   host.querySelector<HTMLInputElement>('[name="showHiddenCountBadge"]')!.addEventListener('change', async e => {
     state.settings.showHiddenCountBadge = (e.target as HTMLInputElement).checked;
+    await persist(state);
+  });
+  host.querySelector<HTMLInputElement>('[name="showSourceUrlInBanner"]')!.addEventListener('change', async e => {
+    state.settings.showSourceUrlInBanner = (e.target as HTMLInputElement).checked;
     await persist(state);
   });
   host.querySelector<HTMLInputElement>('[name="debugMode"]')!.addEventListener('change', async e => {

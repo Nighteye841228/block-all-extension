@@ -66,7 +66,7 @@ export function openAuditModal(opts: AuditModalOptions): { close(): void } {
               <span>套用到勾選:</span>
               ${opts.state.tags.map(t => html`
                 <button
-                  data-selected=${bulkTagIds.has(t.id) ? '' : undefined}
+                  ?data-selected=${bulkTagIds.has(t.id)}
                   style="--color:${t.color ?? '#71717a'}"
                   @click=${() => { bulkTagIds.has(t.id) ? bulkTagIds.delete(t.id) : bulkTagIds.add(t.id); applyBulk(); rerender(); }}
                 >${t.name}</button>
@@ -96,7 +96,7 @@ export function openAuditModal(opts: AuditModalOptions): { close(): void } {
         <span class="tags">
           ${opts.state.tags.map((t: Tag) => html`
             <button
-              data-selected=${r.tagIds.includes(t.id) ? '' : undefined}
+              ?data-selected=${r.tagIds.includes(t.id)}
               style="--color:${t.color ?? '#71717a'}"
               @click=${() => {
                 const i = r.tagIds.indexOf(t.id);

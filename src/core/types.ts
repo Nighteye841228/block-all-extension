@@ -20,6 +20,7 @@ export interface Settings {
   enabled: boolean;
   defaultActionWhenNoTag: TagAction;
   showHiddenCountBadge: boolean;
+  showSourceUrlInBanner: boolean;
   debugMode: boolean;
 }
 

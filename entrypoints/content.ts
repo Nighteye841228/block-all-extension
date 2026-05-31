@@ -18,14 +18,8 @@ export default defineContentScript({
     const decorate = (container: HTMLElement) => {
       const u = extractAuthorUsername(container);
       if (!u) return;
-      injectBlockButton(container, u, async name => {
-        const username = normalizeUsername(name);
-        if (state.blockedUsers[username]) return;
-        state.blockedUsers[username] = {
-          username, tagIds: [], note: '',
-          addedAt: Date.now(), sourceUrl: location.href,
-        };
-        await saveState(state);
+      injectBlockButton(container, u, name => {
+        openAuditFor([normalizeUsername(name)]);
       });
     };
 
@@ -45,6 +39,7 @@ export default defineContentScript({
           }
           await saveState(state);
           host.remove();
+          processor.reset(document);
         },
         onCancel: () => host.remove(),
       });
@@ -54,7 +49,17 @@ export default defineContentScript({
     document.querySelectorAll<HTMLElement>(SELECTORS.postContainer).forEach(decorate);
 
     attachObserver(document.body, el => { processor.enqueue(el); decorate(el); });
-    subscribeState(next => { state = next; processor.enqueueAll(document); });
+    let prevEnabled = state.settings.enabled;
+    subscribeState(next => {
+      const wasEnabled = prevEnabled;
+      state = next;
+      prevEnabled = next.settings.enabled;
+      if (wasEnabled && !next.settings.enabled) {
+        processor.restoreAll(document);
+      } else {
+        processor.reset(document);
+      }
+    });
 
     maybeInjectCommentButton(openAuditFor);
     attachLikesDialogTrigger(openAuditFor);

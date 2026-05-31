@@ -1,31 +1,53 @@
 import { loadState, saveState, subscribeState } from '@core/storage';
 import { AppState } from '@core/types';
+import { renderBlocklist } from '@ui/options-blocklist';
+import { renderTags } from '@ui/options-tags';
+import { renderSettings } from '@ui/options-settings';
+import { renderIox } from '@ui/options-iox';
 
 let state: AppState;
+let currentTab: 'blocklist' | 'tags' | 'settings' | 'iox' = 'blocklist';
 
 async function init() {
   state = await loadState();
-  render();
-  subscribeState(next => { state = next; render(); });
+  setupTabs();
+  setupHeader();
+  rerender();
+  subscribeState(next => { state = next; rerender(); });
 }
 
-function render() {
-  const app = document.getElementById('app')!;
-  const blockedCount = Object.keys(state.blockedUsers).length;
-  app.innerHTML = `
-    <h1>Block-All for Threads</h1>
-    <div class="row">
-      <span>啟用</span>
-      <input id="enabled" type="checkbox" ${state.settings.enabled ? 'checked' : ''}>
-    </div>
-    <div class="stat">已封鎖 ${blockedCount} 個帳號</div>
-    <button id="open-options">開啟完整管理頁</button>
-  `;
+function setupTabs() {
+  document.querySelectorAll<HTMLButtonElement>('#tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab as typeof currentTab;
+      rerender();
+    });
+  });
+}
+
+function setupHeader() {
+  document.getElementById('open-options')!.addEventListener('click', () => chrome.runtime.openOptionsPage());
   document.getElementById('enabled')!.addEventListener('change', async e => {
     state.settings.enabled = (e.target as HTMLInputElement).checked;
     await saveState(state);
   });
-  document.getElementById('open-options')!.addEventListener('click', () => chrome.runtime.openOptionsPage());
+}
+
+function rerender() {
+  (document.getElementById('enabled') as HTMLInputElement).checked = state.settings.enabled;
+  document.getElementById('count')!.textContent = `已封鎖 ${Object.keys(state.blockedUsers).length} 個帳號`;
+
+  const main = document.getElementById('main')!;
+  main.innerHTML = '';
+  const persist = async (next: AppState) => { state = next; await saveState(state); rerender(); };
+  switch (currentTab) {
+    case 'blocklist': renderBlocklist(main, state, persist); break;
+    case 'tags':      renderTags(main, state, persist); break;
+    case 'settings':  renderSettings(main, state, persist); break;
+    case 'iox':       renderIox(main, state, persist); break;
+  }
 }
 
 init();
