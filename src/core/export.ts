@@ -9,13 +9,40 @@ export interface ImportPayload {
   settings: Settings;
 }
 
-export function serializeExport(state: AppState, appVersion: string): string {
+export interface ExportFilter {
+  /** Include users carrying at least one of these tag ids. */
+  tagIds?: string[];
+  /** Include users with zero tags. */
+  includeUntagged?: boolean;
+}
+
+export function filterUsers(state: AppState, filter?: ExportFilter): BlockedUser[] {
+  const users = Object.values(state.blockedUsers);
+  if (!filter) return users;
+  const want = new Set(filter.tagIds ?? []);
+  const includeUntagged = Boolean(filter.includeUntagged);
+  // If neither side is requested, treat filter as no-op (export everything).
+  if (want.size === 0 && !includeUntagged) return users;
+  return users.filter(u => {
+    if (u.tagIds.length === 0) return includeUntagged;
+    return u.tagIds.some(id => want.has(id));
+  });
+}
+
+export function serializeExport(state: AppState, appVersion: string, filter?: ExportFilter): string {
+  const users = filterUsers(state, filter);
+  const referencedTagIds = new Set<string>();
+  for (const u of users) for (const id of u.tagIds) referencedTagIds.add(id);
+  const tags = filter && (filter.tagIds?.length || filter.includeUntagged)
+    ? state.tags.filter(t => referencedTagIds.has(t.id))
+    : state.tags;
+
   const payload: ImportPayload = {
     schemaVersion: state.schemaVersion,
     exportedAt: new Date().toISOString(),
     appVersion,
-    blockedUsers: Object.values(state.blockedUsers),
-    tags: state.tags,
+    blockedUsers: users,
+    tags,
     settings: state.settings,
   };
   return JSON.stringify(payload, null, 2);

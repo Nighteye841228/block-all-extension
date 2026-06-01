@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { serializeExport, parseImport, mergeImport, ImportPayload } from './export';
+import { serializeExport, parseImport, mergeImport, filterUsers, ImportPayload } from './export';
 import { emptyState } from './defaults';
 
 describe('export/import', () => {
@@ -58,6 +58,40 @@ describe('export/import', () => {
     const merged = mergeImport(base, incoming, { mode: 'replace' });
     expect(merged.blockedUsers['alice']).toBeUndefined();
     expect(merged.blockedUsers['bob']).toBeTruthy();
+  });
+
+  it('filterUsers with empty filter returns everything', () => {
+    const s = emptyState();
+    s.blockedUsers['a'] = { username: 'a', tagIds: ['sys:sexism'], note: '', addedAt: 1 };
+    s.blockedUsers['b'] = { username: 'b', tagIds: [], note: '', addedAt: 2 };
+    expect(filterUsers(s).length).toBe(2);
+    expect(filterUsers(s, { tagIds: [], includeUntagged: false }).length).toBe(2);
+  });
+
+  it('filterUsers picks users carrying any of the requested tag ids', () => {
+    const s = emptyState();
+    s.blockedUsers['a'] = { username: 'a', tagIds: ['sys:sexism'], note: '', addedAt: 1 };
+    s.blockedUsers['b'] = { username: 'b', tagIds: ['sys:violence'], note: '', addedAt: 2 };
+    s.blockedUsers['c'] = { username: 'c', tagIds: [], note: '', addedAt: 3 };
+    const out = filterUsers(s, { tagIds: ['sys:sexism'] });
+    expect(out.map(u => u.username).sort()).toEqual(['a']);
+  });
+
+  it('filterUsers includes untagged users when includeUntagged is set', () => {
+    const s = emptyState();
+    s.blockedUsers['a'] = { username: 'a', tagIds: ['sys:sexism'], note: '', addedAt: 1 };
+    s.blockedUsers['c'] = { username: 'c', tagIds: [], note: '', addedAt: 3 };
+    const out = filterUsers(s, { tagIds: ['sys:sexism'], includeUntagged: true });
+    expect(out.map(u => u.username).sort()).toEqual(['a', 'c']);
+  });
+
+  it('serializeExport with filter trims unrelated tags from the payload', () => {
+    const s = emptyState();
+    s.blockedUsers['a'] = { username: 'a', tagIds: ['sys:sexism'], note: '', addedAt: 1 };
+    s.blockedUsers['b'] = { username: 'b', tagIds: ['sys:violence'], note: '', addedAt: 2 };
+    const json = JSON.parse(serializeExport(s, '0.1.0', { tagIds: ['sys:sexism'] }));
+    expect(json.blockedUsers.map((u: { username: string }) => u.username)).toEqual(['a']);
+    expect(json.tags.map((t: { id: string }) => t.id)).toEqual(['sys:sexism']);
   });
 
   it('mergeImport suffixes custom tag id collisions with different names', () => {
