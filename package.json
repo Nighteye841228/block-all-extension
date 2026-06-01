@@ -1,6 +1,6 @@
 {
   "name": "block-all",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha",
   "description": "批次封鎖 Threads 帳號，並以可分類標籤摺疊內容。",
   "type": "module",
   "scripts": {
