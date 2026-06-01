@@ -10,14 +10,14 @@ describe('options-settings', () => {
     expect(document.querySelectorAll('.field').length).toBeGreaterThanOrEqual(3);
   });
 
-  it('changing defaultActionWhenNoTag persists state', async () => {
+  it('changing defaultAction persists state', async () => {
     const s = emptyState();
     const persist = vi.fn().mockResolvedValue(undefined);
     renderSettings(document.body, s, persist);
-    const sel = document.querySelector<HTMLSelectElement>('select[name="defaultActionWhenNoTag"]')!;
+    const sel = document.querySelector<HTMLSelectElement>('select[name="defaultAction"]')!;
     sel.value = 'hide';
     sel.dispatchEvent(new Event('change'));
-    expect(s.settings.defaultActionWhenNoTag).toBe('hide');
+    expect(s.settings.defaultAction).toBe('hide');
     expect(persist).toHaveBeenCalled();
   });
 });

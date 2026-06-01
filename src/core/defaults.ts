@@ -8,7 +8,7 @@ export const DEFAULT_TAGS: Tag[] = [
 
 export const DEFAULT_SETTINGS: Settings = {
   enabled: true,
-  defaultActionWhenNoTag: 'fold',
+  defaultAction: 'fold',
   showHiddenCountBadge: true,
   showSourceUrlInBanner: false,
   debugMode: false,

@@ -15,12 +15,7 @@ export function renderTags(host: HTMLElement, state: AppState, persist: (s: AppS
       row.innerHTML = `
         <div><input value="${escape(tag.name)}" data-name></div>
         <div><input type="color" value="${tag.color ?? '#71717a'}" data-color></div>
-        <div>
-          <select data-action>
-            <option value="fold" ${tag.defaultAction === 'fold' ? 'selected' : ''}>折疊</option>
-            <option value="hide" ${tag.defaultAction === 'hide' ? 'selected' : ''}>隱藏</option>
-          </select>
-        </div>
+        <div><span class="tag-chip" style="--color:${tag.color ?? '#71717a'}">${escape(tag.name)}</span></div>
         <div><button class="btn danger" ${tag.builtin ? 'disabled' : ''}>刪除</button></div>
       `;
       row.querySelector<HTMLInputElement>('[data-name]')!.addEventListener('change', async e => {
@@ -28,9 +23,6 @@ export function renderTags(host: HTMLElement, state: AppState, persist: (s: AppS
       });
       row.querySelector<HTMLInputElement>('[data-color]')!.addEventListener('change', async e => {
         tag.color = (e.target as HTMLInputElement).value; await persist(state);
-      });
-      row.querySelector<HTMLSelectElement>('[data-action]')!.addEventListener('change', async e => {
-        tag.defaultAction = (e.target as HTMLSelectElement).value as 'fold' | 'hide'; await persist(state);
       });
       const delBtn = row.querySelector<HTMLButtonElement>('.danger')!;
       if (!tag.builtin) {

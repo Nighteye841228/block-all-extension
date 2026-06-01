@@ -23,24 +23,18 @@ describe('matcher', () => {
     expect(findBlockedUser(emptyState(), '')).toBeNull();
   });
 
-  it('resolveAction returns first matching tag action', () => {
+  it('resolveAction uses settings.defaultAction (fold by default)', () => {
     const s = emptyState();
-    s.tags.push({ id: 'user:hide-this', name: 'hide-this', defaultAction: 'hide', builtin: false });
-    const u: BlockedUser = { username: 'a', tagIds: ['user:hide-this'], note: '', addedAt: 1 };
-    expect(resolveAction(s, u)).toBe('hide');
+    const u: BlockedUser = { username: 'a', tagIds: ['sys:sexism'], note: '', addedAt: 1 };
+    expect(resolveAction(s, u)).toBe('fold');
   });
 
-  it('resolveAction falls back to settings.defaultActionWhenNoTag when no tags', () => {
+  it('resolveAction returns hide when global setting is hide, regardless of tags', () => {
     const s = emptyState();
-    s.settings.defaultActionWhenNoTag = 'hide';
-    const u: BlockedUser = { username: 'a', tagIds: [], note: '', addedAt: 1 };
-    expect(resolveAction(s, u)).toBe('hide');
-  });
-
-  it('resolveAction prefers hide over fold when any tag wants hide', () => {
-    const s = emptyState();
-    s.tags.push({ id: 'user:hide-it', name: 'h', defaultAction: 'hide', builtin: false });
-    const u: BlockedUser = { username: 'a', tagIds: ['sys:sexism', 'user:hide-it'], note: '', addedAt: 1 };
-    expect(resolveAction(s, u)).toBe('hide');
+    s.settings.defaultAction = 'hide';
+    const tagged: BlockedUser = { username: 'a', tagIds: ['sys:sexism'], note: '', addedAt: 1 };
+    const untagged: BlockedUser = { username: 'b', tagIds: [], note: '', addedAt: 1 };
+    expect(resolveAction(s, tagged)).toBe('hide');
+    expect(resolveAction(s, untagged)).toBe('hide');
   });
 });

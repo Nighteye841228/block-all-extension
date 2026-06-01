@@ -9,9 +9,9 @@ describe('defaults', () => {
     expect(DEFAULT_TAGS.map(t => t.id)).toEqual(['sys:sexism', 'sys:violence', 'sys:gross']);
   });
 
-  it('default settings enable extension and fold-when-no-tag', () => {
+  it('default settings enable extension and default to fold', () => {
     expect(DEFAULT_SETTINGS.enabled).toBe(true);
-    expect(DEFAULT_SETTINGS.defaultActionWhenNoTag).toBe('fold');
+    expect(DEFAULT_SETTINGS.defaultAction).toBe('fold');
   });
 
   it('emptyState carries current schema version, empty users, default tags and settings', () => {

@@ -3,10 +3,10 @@ import { AppState } from '@core/types';
 export function renderSettings(host: HTMLElement, state: AppState, persist: (s: AppState) => Promise<void>): void {
   host.innerHTML = `
     <div class="field">
-      <label for="default-action">無標籤時的預設行為</label>
-      <select id="default-action" name="defaultActionWhenNoTag">
-        <option value="fold" ${state.settings.defaultActionWhenNoTag === 'fold' ? 'selected' : ''}>折疊（顯示橫幅可展開）</option>
-        <option value="hide" ${state.settings.defaultActionWhenNoTag === 'hide' ? 'selected' : ''}>隱藏（display:none）</option>
+      <label for="default-action">封鎖貼文的處理方式（套用所有貼文）</label>
+      <select id="default-action" name="defaultAction">
+        <option value="fold" ${state.settings.defaultAction === 'fold' ? 'selected' : ''}>折疊（顯示橫幅可展開）</option>
+        <option value="hide" ${state.settings.defaultAction === 'hide' ? 'selected' : ''}>隱藏（display:none）</option>
       </select>
     </div>
     <div class="field">
@@ -19,8 +19,8 @@ export function renderSettings(host: HTMLElement, state: AppState, persist: (s: 
       <label><input type="checkbox" name="debugMode" ${state.settings.debugMode ? 'checked' : ''}> 除錯模式（console 紀錄）</label>
     </div>
   `;
-  host.querySelector<HTMLSelectElement>('[name="defaultActionWhenNoTag"]')!.addEventListener('change', async e => {
-    state.settings.defaultActionWhenNoTag = (e.target as HTMLSelectElement).value as 'fold' | 'hide';
+  host.querySelector<HTMLSelectElement>('[name="defaultAction"]')!.addEventListener('change', async e => {
+    state.settings.defaultAction = (e.target as HTMLSelectElement).value as 'fold' | 'hide';
     await persist(state);
   });
   host.querySelector<HTMLInputElement>('[name="showHiddenCountBadge"]')!.addEventListener('change', async e => {

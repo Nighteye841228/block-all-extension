@@ -7,7 +7,12 @@ export async function loadState(): Promise<AppState> {
   const result = await chrome.storage.local.get(STORAGE_KEY);
   const stored = result[STORAGE_KEY] as AppState | undefined;
   if (!stored) return emptyState();
-  return { ...stored, settings: { ...DEFAULT_SETTINGS, ...stored.settings } };
+  const rawSettings = stored.settings as (typeof stored.settings & { defaultActionWhenNoTag?: 'fold' | 'hide' }) | undefined;
+  const migratedAction = rawSettings?.defaultActionWhenNoTag;
+  const merged = { ...DEFAULT_SETTINGS, ...rawSettings };
+  if (migratedAction && !rawSettings?.defaultAction) merged.defaultAction = migratedAction;
+  delete (merged as { defaultActionWhenNoTag?: unknown }).defaultActionWhenNoTag;
+  return { ...stored, settings: merged };
 }
 
 export async function saveState(state: AppState): Promise<void> {

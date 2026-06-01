@@ -18,7 +18,7 @@ export interface Tag {
 
 export interface Settings {
   enabled: boolean;
-  defaultActionWhenNoTag: TagAction;
+  defaultAction: TagAction;
   showHiddenCountBadge: boolean;
   showSourceUrlInBanner: boolean;
   debugMode: boolean;
